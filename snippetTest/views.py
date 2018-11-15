@@ -3,6 +3,7 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
+import bleach
 
 # Create your views here.
 
@@ -12,6 +13,7 @@ def loginView(request):
 
 def submitLogin(request):
 
+#Reject GET requests for this page. 
 	if request.method == 'GET':
 		return redirect('/login/')
 	elif request.method == 'POST':
@@ -21,17 +23,21 @@ def submitLogin(request):
 	
 	#If the button pressed is create new user
 	if selection == 'Create User':
-		username = request.POST['username']
-		password = request.POST['password']
+		username = bleach.clean(request.POST['username'])
+		password = bleach.clean(request.POST['password'])
 		if username == '' or password == '' :
 			error = 'Invalid Username or Password, cannot create account!'
 			return render(request, 'login.html', {'error':error})
 			# return HttpResponseRedirect('/home/', {'error':error})
-	
+		else:
+			user = User.objects.create_user(username, "", password)
+			messages.warning(request, 'Account created, you may now Log In.')
+			return redirect('/login/')
+
 	#If the button pressed is Login		
 	if selection == 'Login':
-		username = request.POST['username']
-		password = request.POST['password']
+		username = bleach.clean(request.POST['username'])
+		password = bleach.clean(request.POST['password'])
 		if username == '' or password == '' :
 			error = 'Invalid Username or Password!'
 			return render(request, 'login.html', {'error':error})
@@ -59,5 +65,15 @@ def homeView(request):
 def submitLogout(request):
 	logout(request)
 	return redirect('/login/')
+
+def testSnippet(request):
+	if request.method == 'GET':
+		return redirect('/home/')
+	elif request.method == 'POST':
+		if request.user.is_authenticated == 'false':
+			return redirect('/login/')
+		else:
+			cleanSnippet = bleach.clean(request.POST['snippetInput'])
+			return render(request, 'home.html', {'cleanSnippet':cleanSnippet,'message':'Your sanitised code snippet is:'})
 
 	

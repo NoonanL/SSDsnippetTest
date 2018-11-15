@@ -5,3 +5,19 @@ welcome {{username}}
 <form action='/submitLogout/' method='post'>{% csrf_token %}
 	<input type='submit' action='/submitLogout/' name='Logout' value = 'Logout'>
 </form>
+
+<form action='/testSnippet/' method='post'>{% csrf_token %}
+	<label name = 'snippetInput'>Enter Code Snippet</label>
+	<div>
+	<textarea name='snippetInput' ></textarea>
+	</div>
+	<input type='submit' action='/testSnippet/' name='testSnippet' value = 'Test Code Snippet'>
+</form>
+
+<h2>{{ message }}</h2>
+<div>
+	{{ cleanSnippet }}
+</div>
+
+<div></div>
+

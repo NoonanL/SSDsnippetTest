@@ -16,13 +16,19 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from hello.views import myView
-from snippetTest.views import loginView, submitLogin, homeView, submitLogout
+from django.views.generic.base import TemplateView
+from django.conf.urls import url
+from snippetTest.views import loginView, submitLogin, homeView, submitLogout, testSnippet
 
 urlpatterns = [
+    url(r'^$', TemplateView.as_view(template_name='login.html'),
+        name='login'),
     path('admin/', admin.site.urls),
     path('sayHello/', myView),
     path('login/', loginView),
     path('submitLogin/', submitLogin),
     path('submitLogout/', submitLogout),
     path('home/', homeView),
+    path('testSnippet/', testSnippet),
+
 ]
