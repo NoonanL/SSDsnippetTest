@@ -16,10 +16,13 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from hello.views import myView
-from snippetTest.views import snippetTestView
+from snippetTest.views import loginView, submitLogin, homeView, submitLogout
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('sayHello/', myView),
-    path('home/', snippetTestView),
+    path('login/', loginView),
+    path('submitLogin/', submitLogin),
+    path('submitLogout/', submitLogout),
+    path('home/', homeView),
 ]
