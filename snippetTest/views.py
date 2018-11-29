@@ -4,60 +4,62 @@ from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
 import bleach
+from snippetTest.models import Snippet
+from django.db.models import Q
 
 # Create your views here.
 
 def loginView(request):
-	users = User.objects.all()
-	return render(request, 'login.html')
-
-def submitLogin(request):
-
-#Reject GET requests for this page. 
+	# users = User.objects.all()
+	# return render(request, 'login.html')
 	if request.method == 'GET':
-		return redirect('/login/')
+		return render(request, 'login.html')
 	elif request.method == 'POST':
 		selection = request.POST['button']
-
-	error = ''
 	
 	#If the button pressed is create new user
 	if selection == 'Create User':
 		username = bleach.clean(request.POST['username'])
 		password = bleach.clean(request.POST['password'])
-		if username == '' or password == '' :
-			error = 'Invalid Username or Password, cannot create account!'
-			return render(request, 'login.html', {'error':error})
+		if username == '' or password == '' or len(username) > 15 or len(username) < 3 or len(password) > 15 or len(password) < 6:
+			messages.warning(request, 'Username or Password do not meet the minimum requirements.')
+			return redirect('/login/')
 			# return HttpResponseRedirect('/home/', {'error':error})
 		else:
-			user = User.objects.create_user(username, "", password)
-			messages.warning(request, 'Account created, you may now Log In.')
-			return redirect('/login/')
+			if User.objects.filter(username=username).exists():
+				messages.warning(request, 'Username or Password do not meet the minimum requirements.')
+				return redirect('/login/')
+			else:
+				user = User.objects.create_user(username, "", password)
+				messages.warning(request, 'Account created, you may now Log In.')
+				return redirect('/login/')
 
 	#If the button pressed is Login		
 	if selection == 'Login':
 		username = bleach.clean(request.POST['username'])
 		password = bleach.clean(request.POST['password'])
 		if username == '' or password == '' :
-			error = 'Invalid Username or Password!'
-			return render(request, 'login.html', {'error':error})
+			messages.warning(request, 'Invalid Username or Password.')
+			return redirect('/login/')
 		else:
 			user = authenticate(request, username = username, password = password)
 			if user is not None:
 				login(request, user)
 				return redirect('/home/')
 			else:
-				error = "Not a valid User"
 				messages.warning(request, 'Not a valid User.')
 				return redirect('/login/')
 	else:
 		return redirect('/login/')
 
+
 def homeView(request):
-	username = request.user.username
 	if request.user.is_authenticated:
+		username = request.user.username
+		allSnippets = Snippet.objects.filter(uploadUser=username)
+		#print(allSnippets)
 		print('Authenticated!')
-		return render(request, 'home.html',{'username':username})
+		return render(request, 'home.html',{'username':username,'allSnippets':allSnippets})
 	else:
 		print('Not authenticated, redirecting to login')
 		return redirect('/login/')
@@ -66,14 +68,90 @@ def submitLogout(request):
 	logout(request)
 	return redirect('/login/')
 
-def testSnippet(request):
-	if request.method == 'GET':
-		return redirect('/home/')
-	elif request.method == 'POST':
-		if request.user.is_authenticated == 'false':
-			return redirect('/login/')
+def deleteSnippet(request, snippetId):
+	if ((request.method == 'POST') and (request.user.is_authenticated == True)):
+		username = request.user.username
+		deleteSnippet = Snippet.objects.get(id=snippetId)
+		if(deleteSnippet.uploadUser == username):
+			deleteSnippet.delete()
+			return redirect('/home/')
 		else:
-			cleanSnippet = bleach.clean(request.POST['snippetInput'])
-			return render(request, 'home.html', {'cleanSnippet':cleanSnippet,'message':'Your sanitised code snippet is:'})
+			allSnippets = Snippet.objects.filter(uploadUser=username)
+			return render(request, 'home.html', {'username':username,
+										'message':'You do not have authorisation to delete that Snippet!',
+										'allSnippets':allSnippets})
+	else:
+		return redirect('/home/')
 
+
+def openSnippet(request, snippetId):
+	if ((request.method == 'POST') and (request.user.is_authenticated == True)):
+		username = request.user.username
+		openSnippet = Snippet.objects.get(id=snippetId)
+		return render(request, 'editSnippet.html', {'username':username,
+								'snippet':openSnippet})
+	else:
+		return redirect('/home/')
+
+
+def editSnippet(request, snippetId):
+	if ((request.method == 'POST') and (request.user.is_authenticated == True)):
+		username = request.user.username
+		openSnippet = Snippet.objects.get(id=snippetId)
+		openSnippet.editedSnippet = request.POST['editedSnippet']
+		openSnippet.editedBy = username
+		openSnippet.save()
+		return render(request, 'editSnippet.html', {'username':username,
+								'snippet':openSnippet})
+	else:
+		return redirect('/home/')
+
+
+def uploadSnippet(request):
+	if ((request.method == 'POST') and (request.user.is_authenticated == True)):
+		print('Got here!')
+		username = request.user.username
+		uploadSnippet = request.POST['snippetInput']
+		snippetTitle = request.POST['snippetTitle']
+		snippetLanguage = request.POST['snippetLanguage']
+		if len(uploadSnippet) > 0 and len(uploadSnippet) < 1024 and len(snippetTitle) > 0 and len(snippetTitle) < 30 and len(snippetLanguage) > 0 and len(snippetLanguage) < 20 :
+			newSnippet = Snippet(uploadUser=username,originalSnippet=uploadSnippet,title=snippetTitle,language=snippetLanguage)
+			newSnippet.save()
+			allSnippets = Snippet.objects.filter(uploadUser=username)
+			cleanSnippet = bleach.clean(request.POST['snippetInput'])
+			return render(request, 'home.html', {'username':username,
+											'cleanSnippet':cleanSnippet,
+											'message':'We have quarantined your snippet as it may contain malicious code. Your sanitised code snippet is:',
+											'allSnippets':allSnippets})
+		else:
+			messages.warning(request, 'Please fill out all fields.')
+			return redirect('/home/')
+
+		
+	else:
+		return redirect('/home/')
+
+
+def viewSnippets(request):
+	if ((request.method == 'POST') and (request.user.is_authenticated == True)):
+		searchStr = request.POST['searchStr']
+		username = request.user.username
+		#cleanSearch = bleach.clean(searchStr)
+		if len(searchStr) < 20:
+			allSnippets = Snippet.objects.filter(Q(originalSnippet__contains=searchStr) | Q(title__contains=searchStr) | Q(language__contains=searchStr))
+			return render(request, 'viewSnippets.html', {'username':username,
+														'allSnippets':allSnippets})
+		else:
+			messages.warning(request, 'Search query too long!')
+			return redirect('/searchSnippets/')
+	else:
+		return redirect('/home/')
+
+def searchSnippetsView(request):
+	if request.user.is_authenticated:
+		username = request.user.username
+		return render(request, 'searchSnippets.html',{'username':username})
+	else:
+		print('Not authenticated, redirecting to login')
+		return redirect('/login/')
 	

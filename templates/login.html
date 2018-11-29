@@ -1,25 +1,42 @@
-<h1>This is the Login Page </h1>
+{% load static %}
 
-<!-- <ul>
-	{% for user in users %}
-	<li>{{user.uname}}</li>
-	{% endfor %}
-</ul> -->
+<!DOCTYPE html>
+<html>
 
-<form action='/submitLogin/' method='post'>{% csrf_token %}
-<div>
-	<label name = 'username'>Username</label>
-	<input type = 'text' name = 'username'/>
+<head>
+	<link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+	<link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css">
+	<link rel="stylesheet" href="{% static 'css/styles.css' %}">
+</head>
+
+
+<body>
+	<div class="login">
+
+	<h1>Login</h1>
+
+	<form action='/submitLogin/' method='post'>{% csrf_token %}
+	<div class='container'>
+		<label name = 'username'>Username</label>
+		<br>
+		<input type = 'text' name = 'username'/>
+		<br>
+		<label name = 'password'>Password</label>
+		<br>
+		<input type = 'password' name = 'password'/>
+		<br>
+		<br>	
+		<input type = 'submit' name = 'button' value = 'Create User'/>
+		<input type = 'submit' name = 'button' value = 'Login'/>
+	</div>
+	</form>
+	{% if messages %}
+		{% for message in messages %}
+		<p class="error">{{ message }}</p>
+		{% endfor %}
+	{% endif %}
+
 </div>
-<div>
-	<label name = 'password'>Password</label>
-	<input type = 'password' name = 'password'/>
-</div>
-	<input type = 'submit' name = 'button' value = 'Create User'/>
-	<input type = 'submit' name = 'button' value = 'Login'/>
-</form>
-{% if messages %}
-	{% for message in messages %}
-	<p>{{ message }}</p>
-	{% endfor %}
-{% endif %}
+
+</body>
+</html>

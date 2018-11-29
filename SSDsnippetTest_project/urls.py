@@ -18,7 +18,7 @@ from django.urls import path
 from hello.views import myView
 from django.views.generic.base import TemplateView
 from django.conf.urls import url
-from snippetTest.views import loginView, submitLogin, homeView, submitLogout, testSnippet
+from snippetTest.views import loginView, homeView, submitLogout, uploadSnippet, deleteSnippet, viewSnippets, editSnippet, openSnippet, searchSnippetsView
 
 urlpatterns = [
     url(r'^$', TemplateView.as_view(template_name='login.html'),
@@ -26,9 +26,15 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('sayHello/', myView),
     path('login/', loginView),
-    path('submitLogin/', submitLogin),
+    path('submitLogin/', loginView),
     path('submitLogout/', submitLogout),
     path('home/', homeView),
-    path('testSnippet/', testSnippet),
+    path('uploadSnippet/', uploadSnippet),
+    path('deleteSnippet/<int:snippetId>/', deleteSnippet),
+    path('viewSnippets/', viewSnippets),
+    path('openSnippet/<int:snippetId>/', openSnippet),    
+    path('editSnippet/<int:snippetId>/', editSnippet),
+    path('searchSnippets/', searchSnippetsView),
+
 
 ]

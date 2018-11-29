@@ -1,23 +1,104 @@
-<h1>This is the home page </h1>
-welcome {{username}}
+{% load static %}
+
+<!DOCTYPE html>
+<html>
+
+<head>
+	<link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+	<link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css">
+	<link rel="stylesheet" href="{% static 'css/styles.css' %}">
+</head>
 
 
-<form action='/submitLogout/' method='post'>{% csrf_token %}
-	<input type='submit' action='/submitLogout/' name='Logout' value = 'Logout'>
-</form>
+<body>
 
-<form action='/testSnippet/' method='post'>{% csrf_token %}
-	<label name = 'snippetInput'>Enter Code Snippet</label>
-	<div>
-	<textarea name='snippetInput' ></textarea>
+	<div class="sidenav">
+	<h3 class="h3menu">Menu</h3>
+  	<a href="/home/">Your Code Snippets</a>
+ 	<a href="/searchSnippets/">Search Snippets</a>
+ 	<a href="/submitLogout/">Logout</a>
 	</div>
-	<input type='submit' action='/testSnippet/' name='testSnippet' value = 'Test Code Snippet'>
-</form>
 
-<h2>{{ message }}</h2>
-<div>
-	{{ cleanSnippet }}
+	<div class="content">
+
+	<h1>Welcome, {{username}}!</h1>
+	<p>Snippet Test allows you to upload a code snippet for others to code review for security errors. Use this page to manage your Snippets!</p>
+
+	{% if message %}
+	<h3>{{ message }}</h3>
+	<div class='cleaned'>
+		<p class='cleanedText'>{{ cleanSnippet }}</p>
+	</div>
+	{% endif %}
+
+	<div class="accordionContainer">
+	<h2>Your code snippets:</h2>
+	<ul class = "list-unstyled">
+		{% for snippet in allSnippets %}
+		<li>
+		<!-- <li>{{ snippet.originalSnippet }} -->
+			<button class="accordion"><b>{{snippet.title}}</b>	</button>
+			<div class="panel">
+  			<p><b>Language:</b> {{snippet.language}}</p>
+  			<p>{{snippet.originalSnippet}}</p>
+  			<form action = '/deleteSnippet/{{snippet.id}}/' 
+			style='display: inline;'
+			method='post'>{% csrf_token %}
+				<input type='submit' value='Delete'/>
+			</form>
+			<form action = '/openSnippet/{{snippet.id}}/' 
+			style='display: inline;'
+			method='post'>{% csrf_token %}
+				<input type='submit' value='View'/>
+			</form>
+			</div>
+		</li>
+		{% endfor %}
+	</ul>
+	</div>
+	
+
+	<h2>Upload:</h2>
+	<p>Upload your code snippets here! You'll recieve an automatic security message once you click upload.</p>
+	<form action='/uploadSnippet/' method='post'>{% csrf_token %}
+		<label name = 'snippetTitle'>Title</label>
+		<br>
+		<input type="text" name='snippetTitle' />
+		<br>
+		<label name = 'snippetLanguage'>Language</label>
+		<br>
+		<input type="text" name='snippetLanguage' />
+		<br>
+		<label name = 'snippetInput'>Upload Code Snippet</label>
+		<div>
+		<textarea name='snippetInput' ></textarea>
+		</div>
+		<input type='submit' action='/uploadSnippet/' name='testSnippet' value = 'Upload Code Snippet'>
+	</form>
+	{% if messages %}
+		{% for message in messages %}
+		<p class="error">{{ message }}</p>
+		{% endfor %}
+	{% endif %}
+
 </div>
 
-<div></div>
+<script>
+var acc = document.getElementsByClassName("accordion");
+var i;
 
+for (i = 0; i < acc.length; i++) {
+    acc[i].addEventListener("click", function() {
+        this.classList.toggle("active");
+        var panel = this.nextElementSibling;
+        if (panel.style.display === "block") {
+            panel.style.display = "none";
+        } else {
+            panel.style.display = "block";
+        }
+    });
+}
+</script>
+
+</body>
+</html>

@@ -1,0 +1,45 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html>
+
+<head>
+	<link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+	<link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css">
+	<link rel="stylesheet" href="{% static 'css/styles.css' %}">
+</head>
+
+
+<body>
+
+	<div class="sidenav">
+	<h3 class="h3menu">Menu</h3>
+  	<a href="/home/">Your Code Snippets</a>
+ 	<a href="/searchSnippets/">Search Snippets</a>
+ 	<a href="/submitLogout/">Logout</a>
+	</div>
+
+	<div class="content">
+
+	<h1>Edit Snippet</h1>
+
+	<h3>Original Snippet</h3>
+	<div>{{snippet.originalSnippet}}</div>
+	<br>
+	<h3>Most Recent Edit by {{snippet.editedBy}}</h3>
+	<div>{{snippet.editedSnippet}}</div>
+	<br><br>
+
+
+	<form action='/editSnippet/{{snippet.id}}/' method='post'>{% csrf_token %}
+		<label name = 'editedSnippet'><h3>Edit Code Snippet</h3></label>
+		<div>
+		<textarea name='editedSnippet' >{{snippet.originalSnippet}}</textarea>
+		</div>
+		<input type='submit' action='/editSnippet/{{snippet.id}}/' name='editSnippet' value = 'Save Edit'>
+	</form>
+
+</div>
+
+</body>
+</html>

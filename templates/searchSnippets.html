@@ -1,0 +1,43 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html>
+
+<head>
+	<link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+	<link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css">
+	<link rel="stylesheet" href="{% static 'css/styles.css' %}">
+</head>
+
+
+<body>
+
+	<div class="sidenav">
+	<h3 class="h3menu">Menu</h3>
+  	<a href="/home/">Your Code Snippets</a>
+ 	<a href="/searchSnippets/">Search Snippets</a>
+ 	<a href="/submitLogout/">Logout</a>
+	</div>
+
+	<div class="content">
+
+	<h1>Welcome, {{username}}!</h1>
+
+	<form action='/viewSnippets/' method='post'>{% csrf_token %}
+		<label name = 'searchStr'>Search code snippets</label>
+		<div>
+		<input type='text' name='searchStr'></input>
+		</div>
+		<input type='submit' action='/viewSnippets/' name='Search Snippets' value = 'Search'>
+	</form>
+	{% if messages %}
+		{% for message in messages %}
+		<p class="error">{{ message }}</p>
+		{% endfor %}
+	{% endif %}
+
+
+</div>
+
+</body>
+</html>

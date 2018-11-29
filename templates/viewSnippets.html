@@ -1,0 +1,73 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html>
+
+<head>
+	<link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+	<link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css">
+	<link rel="stylesheet" href="{% static 'css/styles.css' %}">
+</head>
+
+
+<body>
+
+	<div class="sidenav">
+	<h3 class="h3menu">Menu</h3>
+  	<a href="/home/">Your Code Snippets</a>
+ 	<a href="/searchSnippets/">Search Snippets</a>
+ 	<a href="/submitLogout/">Logout</a>
+	</div>
+
+	<div class="content">
+
+	<h1>Welcome, {{username}}!</h1>
+
+	<div class="accordionContainer">
+	<h3>Search Results:</h3>
+	<ul class = "list-unstyled">
+		{% for snippet in allSnippets %}
+		<li>
+			<button class="accordion"><b>{{snippet.title}}</b> || Published by <b>{{snippet.uploadUser}}</b></button>
+			<div class="panel">
+			<p><b>Language:</b> {{snippet.language}}</p>
+  			<p>{{snippet.originalSnippet}}</p>
+			<form action = '/openSnippet/{{snippet.id}}/' 
+			style='display: inline;'
+			method='post'>{% csrf_token %}
+				<input type='submit' value='Edit'/>
+			</form>
+			</div>
+		</li>
+		{% endfor %}
+	</ul>
+</div>
+
+	<br><br>
+	<form action='/viewSnippets/' method='post'>{% csrf_token %}
+		<label name = 'searchStr'>Search code snippets</label>
+		<div>
+		<input type='text' name='searchStr'></input>
+		</div>
+		<input type='submit' action='/viewSnippets/' name='Search Snippets' value = 'Search'>
+	</form>
+</div>
+
+<script>
+var acc = document.getElementsByClassName("accordion");
+var i;
+
+for (i = 0; i < acc.length; i++) {
+    acc[i].addEventListener("click", function() {
+        this.classList.toggle("active");
+        var panel = this.nextElementSibling;
+        if (panel.style.display === "block") {
+            panel.style.display = "none";
+        } else {
+            panel.style.display = "block";
+        }
+    });
+}
+</script>
+</body>
+</html>
