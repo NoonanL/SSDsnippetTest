@@ -1,5 +1,4 @@
 {% load static %}
-
 <!DOCTYPE html>
 <html>
 
@@ -32,33 +31,44 @@
 
 <div class="textContent">
 
-	<h1>Edit Snippet</h1>
+<h1>Welcome, {{username}}!</h1>
+		
+		<p>Snippet Test allows you to upload a code snippet for others to code review for security errors. Use this page to upload your Snippets!</p>
 
-	{% if message %}
-	<h2>Report:</h2>
-	<h3>{{ message }}</h3>
-	<div class='cleaned'>
-		<p class='cleanedText'>{{ cleanSnippet }}</p>
-	</div>
-	{% endif %}
-
-	<h3>Original Snippet</h3>
-	<div>{{snippet.originalSnippet}}</div>
-	<br>
-	<h3>Most Recent Edit by {{snippet.editedBy}}</h3>
-	<div>{{snippet.editedSnippet}}</div>
-	<br><br>
-
-
-	<form action='/editSnippet/{{snippet.id}}/' method='post'>{% csrf_token %}
-		<label name = 'editedSnippet'><h3>Edit Code Snippet</h3></label>
-		<div>
-		<textarea name='editedSnippet' >{{snippet.originalSnippet}}</textarea>
+		{% if message %}
+		<h2>Report:</h2>
+		<h3>{{ message }}</h3>
+		<div class='cleaned'>
+			<p class='cleanedText'>{{ cleanSnippet }}</p>
 		</div>
-		<button class="btn" type='submit'><i class="fas fa-save"></i> Save Edit</button>
-	</form>
+		{% endif %}
+		
+
+		<h2>Upload:</h2>
+		<p>Upload your code snippets here! You'll recieve an automatic security message once you click upload.</p>
+		<form action='/upload/' method='POST'>{% csrf_token %}
+			<label name = 'snippetTitle'>Title</label>
+			<br>
+			<input type="text" name='snippetTitle' />
+			<br>
+			<label name = 'snippetLanguage'>Language</label>
+			<br>
+			<input type="text" name='snippetLanguage' />
+			<br>
+			<label name = 'snippetInput'>Upload Code Snippet</label>
+			<div>
+			<textarea name='snippetInput' ></textarea>
+			</div>
+			<button class="btn" type='submit' action='/uploadSnippet/' name='testSnippet'><i class="fas fa-upload"></i> Upload Code Snippet</button>
+		</form>
+		{% if messages %}
+			{% for message in messages %}
+			<p class="error">{{ message }}</p>
+			{% endfor %}
+		{% endif %}
 
 </div>
+
 </div>
 
 </body>

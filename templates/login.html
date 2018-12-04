@@ -6,16 +6,24 @@
 <head>
 	<link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
 	<link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css">
+	<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.5.0/css/all.css" integrity="sha384-B4dIYHKNBt8Bc12p+WXckhzcICo0wtJAoU8YZTY5qE0Id1GSseTk6S+L3BlXeVIU" crossorigin="anonymous">
 	<link rel="stylesheet" href="{% static 'css/styles.css' %}">
 </head>
 
 
 <body>
+
+	<div class="header">
+	  <a href="/home/" class="logo">Secure Snippet Test</a>
+	  <div class="header-right">
+	  </div>
+	</div>
+
 	<div class="login">
 
 	<h1>Login</h1>
 
-	<form action='/submitLogin/' method='post'>{% csrf_token %}
+	<form action='/login/' method='post'>{% csrf_token %}
 	<div class='container'>
 		<label name = 'username'>Username</label>
 		<br>

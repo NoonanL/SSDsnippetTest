@@ -6,22 +6,39 @@
 <head>
 	<link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
 	<link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css">
+	<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.5.0/css/all.css" integrity="sha384-B4dIYHKNBt8Bc12p+WXckhzcICo0wtJAoU8YZTY5qE0Id1GSseTk6S+L3BlXeVIU" crossorigin="anonymous">
 	<link rel="stylesheet" href="{% static 'css/styles.css' %}">
 </head>
 
 
 <body>
 
-	<div class="sidenav">
-	<h3 class="h3menu">Menu</h3>
-  	<a href="/home/">Your Code Snippets</a>
- 	<a href="/searchSnippets/">Search Snippets</a>
- 	<a href="/submitLogout/">Logout</a>
+	<div class="header">
+	  <a href="/home/" class="logo"><i class="fas fa-home"></i> Secure Snippet Test</a>
+	  <div class="header-right">
+	  	<form action="/submitLogout/">
+	  	<button type="submit" class="btn"><i class="fas fa-sign-out-alt"></i> Logout</button>
+	  </form>
+	  </div>
 	</div>
 
-	<div class="content">
+<div class="main">
+
+		<div class="sidenav">
+		  	<a href="/home/"><i class="fas fa-home"></i> Your Code Snippets</a>
+		  	<a href="/upload/"><i class="fas fa-upload"></i> Upload Snippet</a>
+		 	<a href="/searchSnippets/"><i class="fas fa-search"></i> Search Snippets</a>
+		</div>
+
+<div class="textContent">
 
 	<h1>Welcome, {{username}}!</h1>
+	<form action='/viewSnippets/' method='post'>{% csrf_token %}
+		<label name = 'searchStr'>Search code snippets:</label>
+		<br>	
+		<input type='text' name='searchStr'></input>
+		<button class="btn" type='submit' style="padding:5px; margin-bottom: 5px"><i class="fas fa-search"></i> Search</button>
+	</form>
 
 	<div class="accordionContainer">
 	<h3>Search Results:</h3>
@@ -35,22 +52,13 @@
 			<form action = '/openSnippet/{{snippet.id}}/' 
 			style='display: inline;'
 			method='post'>{% csrf_token %}
-				<input type='submit' value='Edit'/>
+			<button class="btn" type='submit'><i class="fas fa-edit"></i> Suggest Edit</button>
 			</form>
 			</div>
 		</li>
 		{% endfor %}
 	</ul>
 </div>
-
-	<br><br>
-	<form action='/viewSnippets/' method='post'>{% csrf_token %}
-		<label name = 'searchStr'>Search code snippets</label>
-		<div>
-		<input type='text' name='searchStr'></input>
-		</div>
-		<input type='submit' action='/viewSnippets/' name='Search Snippets' value = 'Search'>
-	</form>
 </div>
 
 <script>

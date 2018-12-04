@@ -31,8 +31,15 @@ def loginView(request):
 				return redirect('/login/')
 			else:
 				user = User.objects.create_user(username, "", password)
-				messages.warning(request, 'Account created, you may now Log In.')
-				return redirect('/login/')
+				# messages.warning(request, 'Account created, you may now Log In.')
+				loggedUser = authenticate(request, username = username, password = password)
+				if user is not None:
+					login(request, loggedUser)
+					return redirect('/home/')
+				else:
+					messages.warning(request, 'Not a valid User.')
+					return redirect('/login/')
+				# return redirect('/login/')
 
 	#If the button pressed is Login		
 	if selection == 'Login':
@@ -98,20 +105,30 @@ def editSnippet(request, snippetId):
 	if ((request.method == 'POST') and (request.user.is_authenticated == True)):
 		username = request.user.username
 		openSnippet = Snippet.objects.get(id=snippetId)
-		openSnippet.editedSnippet = request.POST['editedSnippet']
-		openSnippet.editedBy = username
-		openSnippet.save()
-		return render(request, 'editSnippet.html', {'username':username,
-								'snippet':openSnippet})
+		uploadSnippet = request.POST['editedSnippet']
+		
+		if len(uploadSnippet) > 0 and len(uploadSnippet) < 1024:
+			openSnippet.editedSnippet = uploadSnippet
+			openSnippet.editedBy = username
+			openSnippet.save()
+			cleanSnippet = bleach.clean(uploadSnippet)
+			return render(request, 'editSnippet.html', {'username':username,
+								'snippet':openSnippet,
+								'cleanSnippet':cleanSnippet,
+								'message':'We have quarantined your edit as it may contain malicious code. Your sanitised code snippet is:'
+								})
+		
 	else:
 		return redirect('/home/')
 
 
-def uploadSnippet(request):
-	if ((request.method == 'POST') and (request.user.is_authenticated == True)):
-		print('Got here!')
+def uploadView(request):
+	if request.user.is_authenticated:
 		username = request.user.username
-		uploadSnippet = request.POST['snippetInput']
+		if request.method == 'GET':
+			return render(request, 'upload.html', {'username':username})
+		if request.method == 'POST':
+			uploadSnippet = request.POST['snippetInput']
 		snippetTitle = request.POST['snippetTitle']
 		snippetLanguage = request.POST['snippetLanguage']
 		if len(uploadSnippet) > 0 and len(uploadSnippet) < 1024 and len(snippetTitle) > 0 and len(snippetTitle) < 30 and len(snippetLanguage) > 0 and len(snippetLanguage) < 20 :
@@ -119,22 +136,24 @@ def uploadSnippet(request):
 			newSnippet.save()
 			allSnippets = Snippet.objects.filter(uploadUser=username)
 			cleanSnippet = bleach.clean(request.POST['snippetInput'])
-			return render(request, 'home.html', {'username':username,
+			return render(request, 'upload.html', {'username':username,
 											'cleanSnippet':cleanSnippet,
 											'message':'We have quarantined your snippet as it may contain malicious code. Your sanitised code snippet is:',
 											'allSnippets':allSnippets})
 		else:
 			messages.warning(request, 'Please fill out all fields.')
-			return redirect('/home/')
-
-		
+			return redirect('/upload/')
 	else:
-		return redirect('/home/')
+		return redirect('/login/')
+
 
 
 def viewSnippets(request):
-	if ((request.method == 'POST') and (request.user.is_authenticated == True)):
-		searchStr = request.POST['searchStr']
+	if (request.user.is_authenticated == True):
+		if request.method == 'POST':
+			searchStr = request.POST['searchStr']
+		else:
+			searchStr = ""
 		username = request.user.username
 		#cleanSearch = bleach.clean(searchStr)
 		if len(searchStr) < 20:
@@ -145,13 +164,6 @@ def viewSnippets(request):
 			messages.warning(request, 'Search query too long!')
 			return redirect('/searchSnippets/')
 	else:
-		return redirect('/home/')
-
-def searchSnippetsView(request):
-	if request.user.is_authenticated:
-		username = request.user.username
-		return render(request, 'searchSnippets.html',{'username':username})
-	else:
-		print('Not authenticated, redirecting to login')
 		return redirect('/login/')
+
 	
