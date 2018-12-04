@@ -117,6 +117,11 @@ def editSnippet(request, snippetId):
 								'cleanSnippet':cleanSnippet,
 								'message':'We have quarantined your edit as it may contain malicious code. Your sanitised code snippet is:'
 								})
+		else:
+			return render(request, 'editSnippet.html', {'username':username,
+								'snippet':openSnippet,
+								'message':'Your edited exceeded the maximum length for a Snippet.'
+								})
 		
 	else:
 		return redirect('/home/')
