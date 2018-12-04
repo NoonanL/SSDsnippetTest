@@ -50,6 +50,7 @@ body {
     padding: 12px; /* Some padding */
     margin-top: 2px;
     cursor: pointer; /* Mouse pointer on hover */
+    color:white;
 }
 .btn:hover {
     background-color: #4CAF50;
