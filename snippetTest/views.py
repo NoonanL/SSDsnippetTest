@@ -21,13 +21,13 @@ def loginView(request):
 	if selection == 'Create User':
 		username = bleach.clean(request.POST['username'])
 		password = bleach.clean(request.POST['password'])
-		if username == '' or password == '' or len(username) > 15 or len(username) < 3 or len(password) > 15 or len(password) < 6:
+		if username == '' or password == '' or len(username) > 30 or len(username) < 3 or len(password) > 30 or len(password) < 6:
 			messages.warning(request, 'Username or Password do not meet the minimum requirements.')
 			return redirect('/login/')
 			# return HttpResponseRedirect('/home/', {'error':error})
 		else:
 			if User.objects.filter(username=username).exists():
-				messages.warning(request, 'Username or Password do not meet the minimum requirements.')
+				messages.warning(request, 'Username or Password do not meet the minimum requirements. Usernames and passwords should be between 6 and 30 characters. Existing usernames will not be accepted.')
 				return redirect('/login/')
 			else:
 				user = User.objects.create_user(username, "", password)
