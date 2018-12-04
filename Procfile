@@ -1,1 +1,1 @@
-web: gunicorn SSDsnippetTest.wsgi --log-file -
+web: gunicorn SSDsnippetTest_project.wsgi --log-file -
